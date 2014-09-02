@@ -2,7 +2,6 @@
 #and fields in the Sqlite Database
 from peewee import *
 
-
 database = SqliteDatabase('productcost.db')
 
 #model definitions -- the standard "pattern" is to define a base model class
@@ -68,16 +67,25 @@ class JobCategory(Resource):
 		Default value is 80%. The value is stored as a percentage.	
 	"""
 	
-	def __init__(self, job_category, resource_code, gross_salary, benefits, annual_hours, effective_working_rate):
-		"""Inits JobCategory."""
-		Resource.__init__(self, job_category, resource_code, "hours", 0)
-		self.job_category = job_category
-		self.gross_salary = gross_salary
-		self.benefits = benefits
-		self.annual_hours = annual_hours
-		self.effective_working_rate = effective_working_rate / 100.0
+	job_category = CharField()
+	gross_salary = DecimalField(2)
+	benefits = DecimalField(2)
+	annual_hours = IntegerField()
+	effective_working_rate = DecimalField(2)
+	cost = DecimalField()  # cost per hour
+	
+	
+	# def __init__(self, job_category, resource_code, gross_salary, benefits, annual_hours, effective_working_rate):
+		# """Inits JobCategory."""
+		# Resource.__init__(self, job_category, resource_code, "hours", 0)
+		# self.job_category = job_category
+		# self.gross_salary = gross_salary
+
+		# self.benefits = benefits
+		# self.annual_hours = annual_hours
+		# self.effective_working_rate = effective_working_rate / 100.0
 		
-		self.cost = self.calculate_cost()
+		# self.cost = self.calculate_cost()
 		
 	def calculate_cost(self):
 		"""Calculates the cost per effective working hour based on the object
@@ -94,7 +102,7 @@ if __name__ == "__main__":
 	
 	#database.create_tables([Resource])
 	
-	maquina = Resource.create(name = "Tractor", resource_code="A23", measure_unit="unit", cost = 50000)
+	maquina = Resource.create(name = "Tractor", resource_code="A24", measure_unit="unit", cost = 50000)
 	
 	print maquina.name, maquina.resource_code
 

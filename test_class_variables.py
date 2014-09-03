@@ -62,6 +62,15 @@ class Test_variables(Persistent):
 				print "Ok"
 		else:
 			self.catalogue[position] = gross_salary
+		
+		#opens a connection to ZODB to make the changes permament
+		connection, root = connect_ZODB()
+		
+		root.catalogue = self.catalogue
+		
+		import transaction
+		transaction.commit()
+		connection.close()
 			
 			
 if __name__ == "__main__":
@@ -70,11 +79,11 @@ if __name__ == "__main__":
 	
 	print catalogue.catalogue
 	
-	# catalogue.add_job('mecanico',20000)
-	# catalogue.add_job('secretaria', 15000)
-	# catalogue.add_job('zorra', 150000000)
+	catalogue.add_job('juerguista',20000)
+	catalogue.add_job('secretario', 15000)
+	catalogue.add_job('zorro', 150000000)
 	
-	# print catalogue.catalogue
+	print catalogue.catalogue
 	
 	# connection, root = catalogue.connect_ZODB()
 	

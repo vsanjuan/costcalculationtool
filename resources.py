@@ -56,10 +56,10 @@ class ResourceCatalog(Persistent):
 		"""List all items included in the catalogue.
 		Each child from this class has its own __str__ method"""
 		
-		if type = None : 
+		# if type == None : 
 	
-			form item in self.resource_catalog:
-				print item
+			# form item in self.resource_catalog:
+				# print item
 				
 				
 class JobCategoryCatalogue(ResourceCatalog):
@@ -69,6 +69,62 @@ class JobCategoryCatalogue(ResourceCatalog):
 		self.catalogue
 		
 		
+class JobCatalogue(Persistent):
+	"""Represent a catalogue of the different job categories from where
+	they can be managed and puts it in persistent ZODB storage
+	"""
+	
+	def connect_ZODB(self):
+	
+		from ZODB import FileStorage, DB
+		storage = FileStorage.FileStorage('mydatabase.fs')
+		db = DB(storage)
+		connection = db.open()
+		root = connection.root()
+		
+		if 'job_catalogue' in root:
+			self.job_catalogue = root.job_catalogue
+		else:
+			root.job_catalogue = {}
+			self.job_catalogue = root.job_catalogue
+		
+		return connection, root
+
+	
+	def __init__(self):
+		"""Adds a new Job Category list to the root ZODB if it hasn't
+		been created yet. Otherwise it loads the information from the database.
+		"""
+		connection, root = self.connect_ZODB()
+		
+		self.catalogue = root.job_catalogue
+		
+		# print(type(root))
+		# print(root.items())
+		
+		
+		
+	def add_job(self, job_category, resource_code, gross_salary, benefits, annual_hours, effective_working_rate):
+		"""Adds a new job category to the job catalogue and returns the JobCategory object
+		"""	
+		
+		connection, root = self.connect_ZODB()
+		
+		if  resource_code not in root.job_catalogue:
+			#print(self.job_catalogue[resource_code]
+			new_category = JobCategory(job_category, resource_code, gross_salary, benefits, annual_hours, effective_working_rate)
+			root.job_catalogue[resource_code] = new_category
+			import transaction
+			transaction.commit()
+			return new_category
+		else:
+			print "Resource code already exists. Please check and try again"
+			return new_category # The object is returned to the user to modify it.
+		
+	def search_job(self, resource_code):
+		""" Returns a job object if it matches the code or False if there
+		is no job category with the resource code """
+			
 		
 		
 class JobCategory(Resource):
@@ -96,12 +152,13 @@ class JobCategory(Resource):
 		self.cost = self.calculate_cost()
 		
 		
-	def self __str__(self):
+	def __str__(self):
 	
-		return 	"Code: " + self.resource_code + " Job category: " + self.job_category + " Gross salary: %{:,}".format(self.job_category) +
-				+ " Benefits %{:,} ".format(self.benefits) + " Annual working hours: %{:,}".format(self.annual_hours) + 
-				" Effective working rate {:2f} ".format(self.effective_working_rate) + " Hourly cost: {:2f} ".format(self.cost)
-		
+		# return 	"Code: " + resource_code + " Job category: " + job_category + " Gross salary: %{:,}".format(job_category) +
+				# + " Benefits %{:,} ".format(benefits) + " Annual working hours: %{:,}".format(annual_hours) + 
+				# " Effective working rate {:2f} ".format(effective_working_rate) + " Hourly cost: {:2f} ".format(cost)
+				
+		return "prueba"
 		
 	def calculate_cost(self):
 		"""Calculates the cost per effective working hour based on the object
@@ -114,14 +171,16 @@ class JobCategory(Resource):
 		
 if __name__ == "__main__":
 
-	import ZODB, ZODB.FileStorage
-	
-	storage = ZODB.FileStorage.FileStorage('mydata.fs')
-	db = ZODB.DB(storage)
-	connection = db.open()
-	root = connection.root
+	job_catalogue = JobCatalogue()
 
-	designer = JobCategory("Designer", 10, 30000, 10000, 1800, 80 )
+	# import ZODB, ZODB.FileStorage
+	
+	# storage = ZODB.FileStorage.FileStorage('mydata.fs')
+	# db = ZODB.DB(storage)
+	# connection = db.open()
+	# root = connection.root
+
+	# designer = JobCategory("Designer", 10, 30000, 10000, 1800, 80 )
 	# print "Name ", designer, "\nJob Category", designer.job_category   
 	# print "Gross Salary: {:,}. \nBenefits: {:,}.".format(designer.gross_salary, designer.benefits) 
 	# print "Annual Hours:{:,}. \nWorking rate: {:.2f}%".format(designer.annual_hours, designer.effective_working_rate * 100)
@@ -130,18 +189,28 @@ if __name__ == "__main__":
 	# print "Designer hourly rate: %.2f" % designer_hourly_rate
 	# print "Cost: %.2f" % designer.cost
 	
-	print designer
+	# print designer
 	
-	root.resources = {}
-	root.resources[designer.name] = designer
+	# root.resources = {}
+	# root.resources[designer.name] = designer
 	
-	prueba =  root.resources["Designer"]
+	# prueba =  root.resources["Designer"]
 	
-	print prueba.calculate_cost()
+	# print prueba.calculate_cost()
 	
-	import transaction
+	# import transaction
 	
-	transaction.commit()
+	# transaction.commit()
+	
+	
+	
+	job = job_catalogue.add_job("Designer", 15, 30000, 10000, 1800, 80 )
+	print job
+	print job.gross_salary
+	
+	
+	
+	
 	
 	
 		

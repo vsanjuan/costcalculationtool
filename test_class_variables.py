@@ -2,7 +2,7 @@ from persistent import Persistent
 from ZODB import FileStorage, DB
 import transaction
 
-storage = FileStorage.FileStorage('mydatabase.fs')
+storage = FileStorage.FileStorage('myfatabase.fs')
 db = DB(storage)
 
 class Test_variables(Persistent):
@@ -26,6 +26,15 @@ class Test_variables(Persistent):
 			
 		return connection, root
 		
+	def save_ZODB(self):
+	
+		connection, root = self.connect_ZODB()
+		
+		root.catalogue = self.catalogue
+
+		transaction.commit()
+		connection.close()
+		
 	def add_job(self, position, gross_salary):
 	
 		if position in self.catalogue:
@@ -39,18 +48,15 @@ class Test_variables(Persistent):
 		else:
 			self.catalogue[position] = gross_salary
 		
-		#opens a connection to ZODB to make the changes permament
-		connection, root = self.connect_ZODB()
-		
-		root.catalogue = self.catalogue
-
-		transaction.commit()
-		connection.close()
+		#opens a connection to ZODB to make the changes permanent
+		self.save_ZODB()
 			
 			
 if __name__ == "__main__":
 
 	catalogue = Test_variables()
+	
+	catalogue.add_job('concejal', 50000)
 	
 	print catalogue.catalogue
 	

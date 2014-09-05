@@ -279,6 +279,11 @@ if __name__ == "__main__":
 	prensa = Equipment(21, "Prensa", "Maquina", 20000, 10000)
 	
 	print prensa
+	
+	resource = ResourceCatalogue()
+	
+	resource.list_resources()
+	
 
 	# job_catalogue = JobCatalogue()	
 	

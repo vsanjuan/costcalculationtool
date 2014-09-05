@@ -221,24 +221,25 @@ class JobCategory(Resource):
 		
 		return hourly_cost
 		
+		
 class Equipment(Resource):
-		"""Represents the equipment used in the company to peform different activities.
-		
-		Attributes:
-		
-		Resouce_code : A unique code that identifies the equipment
-		Equipment_name: Name of the equipment 
-		Measure_unit: Unit of measure in which the equipment is kept in inventory.
-		Acquisition_cost : Cost of the equipment installed and working in the company including transport
-		and installation expenses.
-		Useful_life : Time in which the equipment will be productive.
-		Useful_life_time_unit = It can be hours or years depending on the type of equipment.
-		
-		"""
+	"""Represents the equipment used in the company to peform different activities.
+	
+	Attributes:
+	
+	Resouce_code : A unique code that identifies the equipment
+	Equipment_name: Name of the equipment 
+	Measure_unit: Unit of measure in which the equipment is kept in inventory.
+	Acquisition_cost : Cost of the equipment installed and working in the company including transport
+	and installation expenses.
+	Useful_life : Time in which the equipment will be productive.
+	Useful_life_time_unit = It can be hours or years depending on the type of equipment.
+	
+	"""
 
 	def __init__(self, resource_code, equipment_name, measure_unit, acquisition_cost, useful_life, useful_life_time_unit="hours"):
 	
-		Resource.__init__(equipment_name, resource_code, measure_unit, 0)
+		Resource.__init__(self, equipment_name, resource_code, measure_unit, 0)
 		
 		self.acquisition_cost = acquisition_cost				  # acquisition in Euros.
 		self.useful_life = useful_life							  # useful life in hours
@@ -247,16 +248,26 @@ class Equipment(Resource):
 		self.cost = self.calculate_cost()
 		
 		
-	def calculate_cost():
+	def calculate_cost(self):
 		""" Calculates the cost of the equipment per unit of time"""
 	
-		return self.acquistion_cost / self.useful_life
+		return self.acquisition_cost / self.useful_life
 		
-	def __str__:():
+	def __str__(self):
 		
-		return ("
+		return ("Equipment code: {} ".format(self.resource_code) +
+				"\nEquipment name: {} ".format(self.name) +
+				"\nMeasure unit: {} ".format(self.measure_unit) +
+				"\nAcquisition cost: {:,} ".format(self.acquisition_cost) +
+				"\nUseful life: {:,}".format(self.useful_life) +
+				"\nUseful life time unit: {}".format(self.useful_life_time_unit) +
+				"\nCost per time unit: {:.2f}".format(self.cost))
 		
+class Space(Resource):
+
+	"""Represents the space available for the activities performed in the company.
 	
+	"""
 
 	
 		
@@ -264,22 +275,25 @@ class Equipment(Resource):
 		
 if __name__ == "__main__":
 
-	job_catalogue = JobCatalogue()	
+
+	prensa = Equipment(21, "Prensa", "Maquina", 20000, 10000)
 	
-	# paleta = job_catalogue.add_resource("Paleta", 16, 15000, 5000, 1800, 50 )
+	print prensa
+
+	# job_catalogue = JobCatalogue()	
 	
-	# print "*" * 80
+	# # paleta = job_catalogue.add_resource("Paleta", 16, 15000, 5000, 1800, 50 )
 	
-	# designer = job_catalogue.add_resource("Designer", 15, 30000, 10000, 1800, 80 )
+	# # print "*" * 80
 	
-	# print "*" * 80
+	# # designer = job_catalogue.add_resource("Designer", 15, 30000, 10000, 1800, 80 )
 	
-	resource = job_catalogue.search_resource(15)
-	print "El recurso quince es: ",  resource
+	# # print "*" * 80
 	
-	job_catalogue.list_resources(JobCategory)
+	# resource = job_catalogue.search_resource(15)
+	# print "El recurso quince es: ",  resource
 	
-	
+	# job_catalogue.list_resources(JobCategory)
 	
 	#job_catalogue.list_resources()
 	# print job

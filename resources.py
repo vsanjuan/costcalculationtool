@@ -110,7 +110,6 @@ class ResourceCatalogue(Persistent):
 		"""List all items included in the catalogue.
 		Each child from this class has its own __str__ method"""
 		
-		
 		catalogue = self.resource_catalogue.values()
 		
 		print "*" * 80
@@ -118,11 +117,11 @@ class ResourceCatalogue(Persistent):
 		print "*" * 80
 		
 		for resource in catalogue:
-			if type == None:
+			if typeofresource == None:
 				print resource
 				print "*" * 80
 			else:
-				if type(resource) == typeofresource:
+				if typeofresource ==  type(resource):
 					print resource
 					print "*" * 80
 					
@@ -132,10 +131,6 @@ class ResourceCatalogue(Persistent):
 		pass
 	
 		
-		
-		
-				
-						
 		
 class JobCatalogue(ResourceCatalogue):
 	"""Represent a catalogue of the different job categories from where
@@ -171,9 +166,7 @@ class JobCatalogue(ResourceCatalogue):
 			print "Please check and try again"
 			return new_category # The object is returned to the user to modify it.
 		
-	# def search_job(self, resource_code):
-		""" Returns a job object if it matches the code or False if there
-		is no job category with the resource code """
+
 			
 		
 		
@@ -221,6 +214,38 @@ class JobCategory(Resource):
 		
 		return hourly_cost
 		
+class EquipmentCatalogue(ResourceCatalogue):
+	"""Represents a catalogue of the company equipment information
+	from where it be managed and stored in a persistent ZODB storage
+	"""
+	
+	def __init__(self):
+		"""Loads to memory the Resource Catalogue"""
+		ResourceCatalogue.__init__(self)
+	
+	
+	def add_resource(self, resource_code, equipment_name, measure_unit, acquisition_cost, useful_life, useful_life_time_unit="hours"):
+		"""Adds a new equipment to the company catalogue"""
+		
+		new_resource = Equipment(resource_code, equipment_name, measure_unit, acquisition_cost, useful_life, useful_life_time_unit="hours")
+		
+		# checks if the resource code is in the database. If so warns the user before committing the changes
+		if  resource_code not in self.resource_catalogue:
+			
+			#Save the new_category object
+			self.save_ZODB(new_resource)
+
+			return new_resource
+		else:
+			print "Resource {} code already exists. ".format(resource_code) 
+			resource = self.search_resource(resource_code)
+			print resource
+			print "Please check and try again"
+			return new_resource # The object is returned to the user to modify it.
+			
+		
+
+		
 		
 class Equipment(Resource):
 	"""Represents the equipment used in the company to peform different activities.
@@ -267,40 +292,80 @@ class Space(Resource):
 
 	"""Represents the space available for the activities performed in the company.
 	
+	Attributes:
+	
+	Monthly_rental: Rent paid each month by the company without V.A.T.
+	Rental_space: Space rented in square meters.
+	% UsefulSpace: % of the total space that can be employed in company
+	activities.
+	
 	"""
 
+	def __init__(self, space_code, space_name,  monthly_rental, rental_space, useful_space):
 	
+		Resource.__init__(self, space_name, space_code, "square meters", 0)
+		self.monthly_rental = monthly_rental
+		self.rental_space = rental_space
+		self.useful_sapce = useful_space / 100.0
 		
+	def CalculateCost(self):
+		"""Calculates the rental monthly cost per sqm."""
+	
+		return self.monthly_rental / self.rental_space
 		
+	def __str__(self):
+	
+		return ("Space code: {} ".format(self.resource_code) +
+				"\nSpace name: {}".format(self.name) +
+				"\nMonthly rental: {:,}".format(self.monthly_rental) +
+				"\nRental space: {:,}".format(self.rental_space) +
+				"\nUseful space: {:.2%}".format(self.useful_space) +
+				"\nRenta cost per sqm: {:,.2f}".format(self.cost))
+				
 		
 if __name__ == "__main__":
 
+	equipos = EquipmentCatalogue()
+	equipos.add_resource(22, "Cortadora", "Maquina", 30000, 5000)
+	equipos.add_resource(21, "Prensa", "Maquina", 20000, 10000)
+	alquiler_oficina = Space(24, "Oficina centro", 3000, 200, 80)
+	
+	equipos.list_resources()
+	
+	# resource = ResourceCatalogue()
+	
+	# resource.list_resources()
+	
+	catalogue = ResourceCatalogue()
+	
+	catalogue.list_resources(JobCategory)
+	catalogue.list_resources(Equipment)
+	
 
-	prensa = Equipment(21, "Prensa", "Maquina", 20000, 10000)
+	job_catalogue = JobCatalogue()	
 	
-	print prensa
+	# paleta = job_catalogue.add_resource("Paleta", 16, 15000, 5000, 1800, 50 )
 	
-	resource = ResourceCatalogue()
+	# print "*" * 80
 	
-	resource.list_resources()
+	# designer = job_catalogue.add_resource("Designer", 15, 30000, 10000, 1800, 80 )
 	
-
-	# job_catalogue = JobCatalogue()	
-	
-	# # paleta = job_catalogue.add_resource("Paleta", 16, 15000, 5000, 1800, 50 )
-	
-	# # print "*" * 80
-	
-	# # designer = job_catalogue.add_resource("Designer", 15, 30000, 10000, 1800, 80 )
-	
-	# # print "*" * 80
+	# print "*" * 80
 	
 	# resource = job_catalogue.search_resource(15)
 	# print "El recurso quince es: ",  resource
 	
+	# resource = job_catalogue.search_resource(22)
+	
+	
+	# print "El recurso 22 es: ",  resource
+	
 	# job_catalogue.list_resources(JobCategory)
 	
-	#job_catalogue.list_resources()
+	
+	# print "*" * 80
+	# print "Lista todos los recursos"
+	job_catalogue.list_resources()
 	# print job
 	# print paleta
 	# print job.gross_salary
